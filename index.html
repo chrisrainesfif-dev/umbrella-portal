@@ -1,499 +1,374 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Umbrella Corporation — Transport Log Access</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umbrella Corporation — Transport Log Access</title>
 
-  <style>
-    :root{
-      --bg:#0b0b0d;
-      --panel:#141418;
-      --ink:#f5f5f5;
-      --muted:#9ca3af;
-      --line:#2a2a32;
-      --danger:#c1121f;
-    }
+<style>
+:root{
+  --bg:#0b0b0d;
+  --panel:#141418;
+  --ink:#f5f5f5;
+  --muted:#9ca3af;
+  --line:#2a2a32;
+  --danger:#c1121f;
+}
 
-    *{box-sizing:border-box}
+*{box-sizing:border-box}
 
-    body{
-      margin:0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.45;
-    }
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow-x:hidden;
+}
 
-    .page{
-      max-width: 920px;
-      margin: 60px auto;
-      padding: 0 24px 80px;
-    }
+/* Scanning overlay */
+.scanline{
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  z-index:5;
+}
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap: 16px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 20px;
-    }
+.scanline::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,
+    rgba(193,18,31,0),
+    rgba(193,18,31,.8),
+    rgba(193,18,31,0)
+  );
+  box-shadow:0 0 18px rgba(193,18,31,.6);
+  animation:scanDown 8s linear infinite;
+  opacity:.35;
+}
 
-    .brand h1{
-      margin:0;
-      font-size: 20px;
-      letter-spacing: .15em;
-      font-weight: 700;
-    }
+@keyframes scanDown{
+  from{ transform:translateY(-10%); }
+  to{ transform:translateY(120vh); }
+}
 
-    .brand .sub{
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: .06em;
-    }
+/* Boot flicker */
+.bootFlicker{
+  animation:bootFlicker .9s linear 1;
+}
 
-    .stamp{
-      border: 2px solid var(--danger);
-      color: var(--danger);
-      padding: 10px 14px;
-      transform: rotate(-10deg);
-      font-weight: 700;
-      opacity: .22;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      user-select: none;
-    }
+@keyframes bootFlicker{
+  0%{opacity:0}
+  20%{opacity:.4}
+  40%{opacity:1}
+  60%{opacity:.3}
+  80%{opacity:1}
+  100%{opacity:1}
+}
 
-    @media (max-width: 720px){
-      .stamp{display:none;}
-      .page{margin: 30px auto;}
-      .brand h1{font-size: 18px;}
-    }
+.page{
+  max-width:900px;
+  margin:60px auto;
+  padding:0 24px 80px;
+}
 
-    .panel{
-      border: 1px solid var(--line);
-      background: var(--panel);
-      padding: 24px;
-      border-radius: 6px;
-      margin-top: 40px;
-      box-shadow: 0 0 30px rgba(0,0,0,.65);
-    }
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  padding-bottom:20px;
+}
 
-    .panel h2{
-      margin: 0 0 10px;
-      letter-spacing: .12em;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+.brand h1{
+  margin:0;
+  font-size:20px;
+  letter-spacing:.15em;
+}
 
-    .panel p{
-      margin: 0 0 16px;
-      font-size: 14px;
-      color: var(--ink);
-    }
+.brand .sub{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+}
 
-    .meta{
-      border: 1px solid var(--line);
-      background: #101014;
-      border-radius: 6px;
-      padding: 14px;
-      margin: 14px 0 18px;
-      font-size: 13px;
-      color: var(--muted);
-    }
+.stamp{
+  border:2px solid var(--danger);
+  color:var(--danger);
+  padding:10px 14px;
+  transform:rotate(-10deg);
+  font-weight:bold;
+  opacity:.25;
+  letter-spacing:.2em;
+}
 
-    .meta b{color: var(--ink); font-weight: 700;}
+/* Main Logo Glow */
+.mainLogoWrap{
+  display:flex;
+  justify-content:center;
+  margin:40px 0 10px;
+  position:relative;
+}
 
-    .btnRow{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
+.mainLogoWrap::before{
+  content:"";
+  position:absolute;
+  width:320px;
+  height:320px;
+  border-radius:999px;
+  background:radial-gradient(circle,
+    rgba(193,18,31,.3) 0%,
+    rgba(193,18,31,.15) 40%,
+    transparent 70%);
+  filter:blur(12px);
+  animation:pulseGlow 4s ease-in-out infinite;
+}
 
-    .btn{
-      background: transparent;
-      border: 1px solid var(--ink);
-      color: var(--ink);
-      padding: 12px 18px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      transition: all .18s ease;
-      text-decoration: none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
+@keyframes pulseGlow{
+  0%,100%{transform:scale(.95);opacity:.4}
+  50%{transform:scale(1.05);opacity:.65}
+}
 
-    .btn:hover{
-      background: var(--ink);
-      color: #000;
-    }
+.mainUmbrellaLogo{
+  width:160px;
+  position:relative;
+  z-index:1;
+  filter:drop-shadow(0 0 18px rgba(193,18,31,.4));
+}
 
-    .btn.secondary{
-      border-color: var(--line);
-      color: var(--muted);
-    }
-    .btn.secondary:hover{
-      background: transparent;
-      border-color: var(--ink);
-      color: var(--ink);
-    }
+/* Panel */
+.panel{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:24px;
+  border-radius:6px;
+  margin-top:40px;
+  box-shadow:0 0 30px rgba(0,0,0,.6);
+}
 
-    footer{
-      margin-top: 60px;
-      font-size: 11px;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
-      letter-spacing: .04em;
-    }
+.panel h2{
+  margin:0 0 10px;
+  letter-spacing:.12em;
+  font-size:14px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
 
-    /* Overlays / Modals */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.90);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      z-index: 50;
-    }
+.meta{
+  border:1px solid var(--line);
+  background:#101014;
+  border-radius:6px;
+  padding:14px;
+  margin:14px 0 18px;
+  font-size:13px;
+  color:var(--muted);
+}
 
-    .modal{
-      width: min(900px, 100%);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 0 40px rgba(0,0,0,.9);
-    }
+.btn{
+  background:transparent;
+  border:1px solid var(--ink);
+  color:var(--ink);
+  padding:12px 18px;
+  border-radius:4px;
+  cursor:pointer;
+  font-weight:bold;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:.2s;
+}
 
-    .modalHeader{
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--line);
-      font-weight: 700;
-      letter-spacing: .12em;
-      font-size: 12px;
-      text-transform: uppercase;
-      background: #101014;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-    }
+.btn:hover{
+  background:var(--ink);
+  color:#000;
+}
 
-    .close{
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      padding: 10px 12px;
-      border-radius: 4px;
-      cursor:pointer;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
+footer{
+  margin-top:60px;
+  font-size:11px;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+  padding-top:16px;
+}
 
-    .close:hover{
-      border-color: var(--ink);
-      color: var(--ink);
-    }
+/* Overlays */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
 
-    .modalBody{
-      padding: 20px;
-    }
+.modal{
+  width:min(900px,100%);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  overflow:hidden;
+}
 
-    iframe{
-      width: 100%;
-      height: 72vh;
-      border: none;
-      background: #000;
-    }
+.modalHeader{
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  background:#101014;
+}
 
-    .progressWrap{
-      border: 1px solid var(--line);
-      background: #101014;
-      border-radius: 6px;
-      padding: 18px;
-    }
+.modalBody{
+  padding:20px;
+  text-align:center;
+}
 
-    .auditLine{
-      display:flex;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
+iframe{
+  width:100%;
+  height:75vh;
+  border:none;
+}
 
-    .auditLine .flag{
-      color: var(--danger);
-      font-weight: 800;
-      letter-spacing: .14em;
-    }
+/* Loader Logo Spin */
+.loaderLogo{
+  width:140px;
+  margin-bottom:20px;
+  animation:spin 10s linear infinite;
+}
 
-    .auditMsg{
-      margin-top: 12px;
-      font-size: 14px;
-      color: var(--ink);
-    }
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
 
-    .timestamp{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
+.progress{
+  height:8px;
+  background:#1f1f24;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:20px;
+}
 
-    .progress{
-      height: 8px;
-      background: #1f1f24;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 18px;
-      border: 1px solid var(--line);
-    }
-
-    .bar{
-      height: 100%;
-      width: 0%;
-      background: var(--danger);
-      box-shadow: 0 0 10px var(--danger);
-    }
-
-    .pct{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .tiny{
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* Umbrella logo loader */
-    .logoWrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin: 8px 0 14px;
-    }
-
-    .umbrellaLogo{
-      width: 140px;
-      height: 140px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 14px rgba(193,18,31,.25));
-      animation: slowSpin 10s linear infinite; /* slow spin */
-    }
-
-    @keyframes slowSpin{
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-  </style>
+.bar{
+  height:100%;
+  width:0%;
+  background:var(--danger);
+  box-shadow:0 0 10px var(--danger);
+}
+</style>
 </head>
 
 <body>
-  <div class="page">
-    <div class="topbar">
-      <div class="brand">
-        <h1>UMBRELLA CORPORATION</h1>
-        <div class="sub">Biohazard Containment &amp; Research Division • Global Operations Command</div>
-      </div>
-      <div class="stamp">CONFIDENTIAL</div>
-    </div>
 
-    <div class="panel">
-      <h2>Transport Log Access Portal</h2>
-      <p>Classification: <b>LEVEL 4 — RESTRICTED</b> • All access attempts are logged for audit compliance.</p>
+<div class="scanline"></div>
 
-      <div class="meta">
-        <div><b>Document:</b> UC-BCRD-13B-EDN</div>
-        <div><b>Project:</b> EDEN PROTOCOL</div>
-        <div><b>Specimen:</b> T-VIRUS VARIANT 13-B</div>
-        <div><b>Transport Status:</b> ACTIVE</div>
-        <div><b>Handling Clearance:</b> ALPHA-7 OR HIGHER</div>
-      </div>
+<div class="page">
 
-      <div class="btnRow">
-        <button class="btn" id="openBtn">View Containment File</button>
-        <a class="btn secondary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
-      </div>
-    </div>
+<div class="topbar bootFlicker">
+  <div class="brand">
+    <h1>UMBRELLA CORPORATION</h1>
+    <div class="sub">Biohazard Containment & Research Division</div>
+  </div>
+  <div class="stamp">CONFIDENTIAL</div>
+</div>
 
-    <footer>
-      Umbrella Corporation — Internal Use Only • This portal is a simulated access interface for display purposes.
-      <br>
-      © Umbrella Corporation. All activity may be monitored and recorded.
-    </footer>
+<div class="mainLogoWrap bootFlicker">
+  <img class="mainUmbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Logo">
+</div>
+
+<div class="panel">
+  <h2>Transport Log Access Portal</h2>
+
+  <div class="meta">
+    Document: UC-BCRD-13B-EDN<br>
+    Project: EDEN PROTOCOL<br>
+    Specimen: T-VIRUS VARIANT 13-B<br>
+    Clearance: ALPHA-7 OR HIGHER
   </div>
 
-  <!-- ACCESS OVERLAY (10s load + spinning logo) -->
-  <div class="overlay" id="accessOverlay" role="dialog" aria-modal="true">
-    <div class="modal" style="max-width: 680px;">
-      <div class="modalHeader">
-        <div>Credential Verification</div>
-        <button class="close" id="accessCloseBtn">Close</button>
+  <button class="btn" id="openBtn">View Containment File</button>
+</div>
+
+<footer>
+Umbrella Corporation — Internal Use Only • All access monitored.
+</footer>
+
+</div>
+
+<!-- Loading Screen -->
+<div class="overlay" id="accessOverlay">
+  <div class="modal">
+    <div class="modalHeader">Credential Verification</div>
+    <div class="modalBody">
+      <img src="./umbrella-logo.jpg" class="loaderLogo" alt="Umbrella Logo">
+      <div id="statusMsg">Initializing secure session…</div>
+      <div class="progress">
+        <div class="bar" id="bar"></div>
       </div>
-      <div class="modalBody">
-        <div class="progressWrap">
-          <div class="logoWrap">
-            <!-- IMPORTANT: upload your logo to the repo and name it umbrella-logo.jpg -->
-            <img class="umbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Corporation Logo">
-          </div>
-
-          <div class="auditLine">
-            <div>Audit Event</div>
-            <div class="flag">ACCESS LOGGED</div>
-          </div>
-
-          <div class="auditMsg" id="auditMsg">Initializing secure session… <span style="color:var(--muted)">(Accord 17-C)</span></div>
-          <div class="timestamp">Timestamp: <span id="auditTime"></span></div>
-
-          <div class="progress">
-            <div class="bar" id="auditBar"></div>
-          </div>
-          <div class="pct" id="auditPct">0%</div>
-
-          <div class="tiny">Destination: <b style="color:var(--ink)">Containment File Viewer</b> • UC-BCRD-13B-EDN</div>
-        </div>
-      </div>
+      <div id="percent">0%</div>
     </div>
   </div>
+</div>
 
-  <!-- PDF OVERLAY -->
-  <div class="overlay" id="pdfOverlay" role="dialog" aria-modal="true">
-    <div class="modal">
-      <div class="modalHeader">
-        <div>Containment File Viewer — UC-BCRD-13B-EDN</div>
-        <button class="close" id="pdfCloseBtn">Close</button>
-      </div>
-      <iframe id="pdfFrame" title="Containment File PDF"></iframe>
-    </div>
+<!-- PDF Viewer -->
+<div class="overlay" id="pdfOverlay">
+  <div class="modal">
+    <div class="modalHeader">Containment File Viewer</div>
+    <iframe id="pdfFrame"></iframe>
   </div>
+</div>
 
-  <script>
-    // Your Google Drive file
-    const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
+<script>
+const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
+const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
 
-    // Embed preview link (works in iframe)
-    const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
+const openBtn = document.getElementById("openBtn");
+const accessOverlay = document.getElementById("accessOverlay");
+const pdfOverlay = document.getElementById("pdfOverlay");
+const bar = document.getElementById("bar");
+const percent = document.getElementById("percent");
+const pdfFrame = document.getElementById("pdfFrame");
+const statusMsg = document.getElementById("statusMsg");
 
-    // Direct download link
-    const DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
+openBtn.addEventListener("click", () => {
 
-    // Loading screen duration (ms) — requested ~10 seconds
-    const LOADING_DURATION_MS = 10000;
+  bar.style.width = "0%";
+  percent.textContent = "0%";
+  statusMsg.textContent = "Initializing secure session…";
 
-    const openBtn = document.getElementById("openBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
+  accessOverlay.style.display = "flex";
 
-    const accessOverlay = document.getElementById("accessOverlay");
-    const accessCloseBtn = document.getElementById("accessCloseBtn");
+  let start = performance.now();
+  let duration = 10000; // 10 seconds
 
-    const pdfOverlay = document.getElementById("pdfOverlay");
-    const pdfCloseBtn = document.getElementById("pdfCloseBtn");
-    const pdfFrame = document.getElementById("pdfFrame");
+  function animate(now){
+    let progress = Math.min((now - start) / duration, 1);
+    let pct = Math.floor(progress * 100);
 
-    const auditTime = document.getElementById("auditTime");
-    const auditBar = document.getElementById("auditBar");
-    const auditPct = document.getElementById("auditPct");
-    const auditMsg = document.getElementById("auditMsg");
+    bar.style.width = pct + "%";
+    percent.textContent = pct + "%";
 
-    downloadBtn.href = DOWNLOAD_URL;
+    if(pct === 25) statusMsg.textContent = "Decrypting containment file header…";
+    if(pct === 55) statusMsg.textContent = "Validating chain-of-custody signature…";
+    if(pct === 85) statusMsg.textContent = "Finalizing viewer session…";
 
-    function pad(n){ return String(n).padStart(2,"0"); }
-
-    function formatTimestamp(d){
-      const yyyy = d.getFullYear();
-      const mm = pad(d.getMonth()+1);
-      const dd = pad(d.getDate());
-      const hh = pad(d.getHours());
-      const mi = pad(d.getMinutes());
-      const ss = pad(d.getSeconds());
-      const off = -d.getTimezoneOffset();
-      const sign = off >= 0 ? "+" : "-";
-      const abs = Math.abs(off);
-      const oh = pad(Math.floor(abs/60));
-      const om = pad(abs%60);
-      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} UTC${sign}${oh}:${om}`;
+    if(progress < 1){
+      requestAnimationFrame(animate);
+    } else {
+      statusMsg.textContent = "Access granted.";
+      setTimeout(()=>{
+        accessOverlay.style.display = "none";
+        pdfOverlay.style.display = "flex";
+        pdfFrame.src = PDF_URL;
+      }, 600);
     }
+  }
 
-    function show(el){ el.style.display = "flex"; document.body.style.overflow = "hidden"; }
-    function hide(el){ el.style.display = "none"; document.body.style.overflow = ""; }
+  requestAnimationFrame(animate);
+});
+</script>
 
-    function openAccessThenPdf(){
-      // reset UI
-      auditTime.textContent = formatTimestamp(new Date());
-      auditBar.style.width = "0%";
-      auditPct.textContent = "0%";
-      auditMsg.innerHTML = 'Initializing secure session… <span style="color:var(--muted)">(Accord 17-C)</span>';
-
-      show(accessOverlay);
-
-      const start = performance.now();
-
-      function tick(now){
-        const t = Math.min(1, (now - start) / LOADING_DURATION_MS);
-        const pct = Math.round(t * 100);
-
-        auditBar.style.width = pct + "%";
-        auditPct.textContent = pct + "%";
-
-        // Optional staged messaging to feel like a system boot
-        if (pct === 10) auditMsg.textContent = "Validating transport authorization…";
-        if (pct === 35) auditMsg.textContent = "Decrypting containment file header…";
-        if (pct === 65) auditMsg.textContent = "Verifying chain-of-custody signature…";
-        if (pct === 90) auditMsg.textContent = "Finalizing viewer session…";
-
-        if (t < 1){
-          requestAnimationFrame(tick);
-        } else {
-          auditMsg.textContent = "Verification complete. Opening containment file…";
-          setTimeout(() => {
-            hide(accessOverlay);
-            pdfFrame.src = PDF_URL;
-            show(pdfOverlay);
-          }, 500);
-        }
-      }
-
-      requestAnimationFrame(tick);
-    }
-
-    function closePdf(){
-      hide(pdfOverlay);
-      pdfFrame.src = "";
-    }
-
-    openBtn.addEventListener("click", openAccessThenPdf);
-    accessCloseBtn.addEventListener("click", () => hide(accessOverlay));
-    pdfCloseBtn.addEventListener("click", closePdf);
-
-    // Click backdrop to close
-    accessOverlay.addEventListener("click", (e) => { if (e.target === accessOverlay) hide(accessOverlay); });
-    pdfOverlay.addEventListener("click", (e) => { if (e.target === pdfOverlay) closePdf(); });
-
-    // ESC closes
-    window.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      if (pdfOverlay.style.display === "flex") closePdf();
-      else if (accessOverlay.style.display === "flex") hide(accessOverlay);
-    });
-  </script>
 </body>
 </html>
 
