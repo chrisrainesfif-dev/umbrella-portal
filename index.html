@@ -1,375 +1,666 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Umbrella Corporation — Transport Log Access</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Umbrella Corporation — Transport Log Access</title>
 
-<style>
-:root{
-  --bg:#0b0b0d;
-  --panel:#141418;
-  --ink:#f5f5f5;
-  --muted:#9ca3af;
-  --line:#2a2a32;
-  --danger:#c1121f;
-}
+  <style>
+    :root{
+      --bg:#07070a;
+      --panel:#101014;
+      --panel2:#0c0c10;
+      --ink:#f5f5f5;
+      --muted:#9ca3af;
+      --line:#26262f;
+      --danger:#c1121f;
+      --ok:#22c55e;
+    }
 
-*{box-sizing:border-box}
+    *{box-sizing:border-box}
 
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  overflow-x:hidden;
-}
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
 
-/* Scanning overlay */
-.scanline{
-  pointer-events:none;
-  position:fixed;
-  inset:0;
-  z-index:5;
-}
+    .page{
+      max-width: 920px;
+      margin: 60px auto;
+      padding: 0 24px 80px;
+    }
 
-.scanline::before{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  height:2px;
-  background:linear-gradient(90deg,
-    rgba(193,18,31,0),
-    rgba(193,18,31,.8),
-    rgba(193,18,31,0)
-  );
-  box-shadow:0 0 18px rgba(193,18,31,.6);
-  animation:scanDown 8s linear infinite;
-  opacity:.35;
-}
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+    }
 
-@keyframes scanDown{
-  from{ transform:translateY(-10%); }
-  to{ transform:translateY(120vh); }
-}
+    .brand h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .15em;
+      font-weight: 700;
+    }
 
-/* Boot flicker */
-.bootFlicker{
-  animation:bootFlicker .9s linear 1;
-}
+    .brand .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
 
-@keyframes bootFlicker{
-  0%{opacity:0}
-  20%{opacity:.4}
-  40%{opacity:1}
-  60%{opacity:.3}
-  80%{opacity:1}
-  100%{opacity:1}
-}
+    .stamp{
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      padding: 10px 14px;
+      transform: rotate(-10deg);
+      font-weight: 700;
+      opacity: .22;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      user-select: none;
+    }
 
-.page{
-  max-width:900px;
-  margin:60px auto;
-  padding:0 24px 80px;
-}
+    @media (max-width: 720px){
+      .stamp{display:none;}
+      .page{margin: 30px auto;}
+      .brand h1{font-size: 18px;}
+    }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid var(--line);
-  padding-bottom:20px;
-}
+    .panel{
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      padding: 24px;
+      border-radius: 6px;
+      margin-top: 40px;
+      box-shadow: 0 0 30px rgba(0,0,0,.7);
+    }
 
-.brand h1{
-  margin:0;
-  font-size:20px;
-  letter-spacing:.15em;
-}
+    .panel h2{
+      margin: 0 0 10px;
+      letter-spacing: .12em;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
-.brand .sub{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-}
+    .panel p{
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--ink);
+    }
 
-.stamp{
-  border:2px solid var(--danger);
-  color:var(--danger);
-  padding:10px 14px;
-  transform:rotate(-10deg);
-  font-weight:bold;
-  opacity:.25;
-  letter-spacing:.2em;
-}
+    .meta{
+      border: 1px solid var(--line);
+      background: #0a0a0d;
+      border-radius: 6px;
+      padding: 14px;
+      margin: 14px 0 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .meta b{color: var(--ink); font-weight: 700;}
 
-/* Main Logo Glow */
-.mainLogoWrap{
-  display:flex;
-  justify-content:center;
-  margin:40px 0 10px;
-  position:relative;
-}
+    .btnRow{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
 
-.mainLogoWrap::before{
-  content:"";
-  position:absolute;
-  width:320px;
-  height:320px;
-  border-radius:999px;
-  background:radial-gradient(circle,
-    rgba(193,18,31,.3) 0%,
-    rgba(193,18,31,.15) 40%,
-    transparent 70%);
-  filter:blur(12px);
-  animation:pulseGlow 4s ease-in-out infinite;
-}
+    .btn{
+      background: transparent;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      padding: 12px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: all .18s ease;
+      text-decoration: none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-@keyframes pulseGlow{
-  0%,100%{transform:scale(.95);opacity:.4}
-  50%{transform:scale(1.05);opacity:.65}
-}
+    .btn:hover{
+      background: var(--ink);
+      color: #000;
+    }
 
-.mainUmbrellaLogo{
-  width:160px;
-  position:relative;
-  z-index:1;
-  filter:drop-shadow(0 0 18px rgba(193,18,31,.4));
-}
+    .btn.secondary{
+      border-color: var(--line);
+      color: var(--muted);
+    }
+    .btn.secondary:hover{
+      background: transparent;
+      border-color: var(--ink);
+      color: var(--ink);
+    }
 
-/* Panel */
-.panel{
-  border:1px solid var(--line);
-  background:var(--panel);
-  padding:24px;
-  border-radius:6px;
-  margin-top:40px;
-  box-shadow:0 0 30px rgba(0,0,0,.6);
-}
+    footer{
+      margin-top: 60px;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+      letter-spacing: .04em;
+    }
 
-.panel h2{
-  margin:0 0 10px;
-  letter-spacing:.12em;
-  font-size:14px;
-  text-transform:uppercase;
-  color:var(--muted);
-}
+    /* Overlays / Modals */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 50;
+    }
 
-.meta{
-  border:1px solid var(--line);
-  background:#101014;
-  border-radius:6px;
-  padding:14px;
-  margin:14px 0 18px;
-  font-size:13px;
-  color:var(--muted);
-}
+    .modal{
+      width: min(900px, 100%);
+      background: linear-gradient(180deg, #0c0c10, #09090c);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,.95);
+      position: relative;
+    }
 
-.btn{
-  background:transparent;
-  border:1px solid var(--ink);
-  color:var(--ink);
-  padding:12px 18px;
-  border-radius:4px;
-  cursor:pointer;
-  font-weight:bold;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  transition:.2s;
-}
+    /* subtle scanline */
+    .modal::after{
+      content:"";
+      pointer-events:none;
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        rgba(0,0,0,0) 3px,
+        rgba(0,0,0,0) 6px
+      );
+      opacity:.08;
+      mix-blend-mode: screen;
+    }
 
-.btn:hover{
-  background:var(--ink);
-  color:#000;
-}
+    .modalHeader{
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      letter-spacing: .12em;
+      font-size: 12px;
+      text-transform: uppercase;
+      background: #0b0b0f;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
 
-footer{
-  margin-top:60px;
-  font-size:11px;
-  color:var(--muted);
-  border-top:1px solid var(--line);
-  padding-top:16px;
-}
+    .close{
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 4px;
+      cursor:pointer;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
 
-/* Overlays */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.92);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:50;
-}
+    .close:hover{
+      border-color: var(--ink);
+      color: var(--ink);
+    }
 
-.modal{
-  width:min(900px,100%);
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:6px;
-  overflow:hidden;
-}
+    .modalBody{
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
 
-.modalHeader{
-  padding:14px 18px;
-  border-bottom:1px solid var(--line);
-  font-size:12px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  background:#101014;
-}
+    iframe{
+      width: 100%;
+      height: 72vh;
+      border: none;
+      background: #000;
+      position: relative;
+      z-index: 1;
+    }
 
-.modalBody{
-  padding:20px;
-  text-align:center;
-}
+    .progressWrap{
+      border: 1px solid var(--line);
+      background: #07070a;
+      border-radius: 6px;
+      padding: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
 
-iframe{
-  width:100%;
-  height:75vh;
-  border:none;
-}
+    .auditLine{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
 
-/* Loader Logo Spin */
-.loaderLogo{
-  width:140px;
-  margin-bottom:20px;
-  animation:spin 10s linear infinite;
-}
+    .auditLine .flag{
+      color: var(--danger);
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
 
-@keyframes spin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
+    .timestamp{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-.progress{
-  height:8px;
-  background:#1f1f24;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:20px;
-}
+    .progress{
+      height: 8px;
+      background: #14141a;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+    }
 
-.bar{
-  height:100%;
-  width:0%;
-  background:var(--danger);
-  box-shadow:0 0 10px var(--danger);
-}
-</style>
+    .bar{
+      height: 100%;
+      width: 0%;
+      background: var(--danger);
+      box-shadow: 0 0 12px rgba(193,18,31,.65);
+    }
+
+    .pct{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tiny{
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Umbrella logo loader */
+    .logoWrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin: 10px 0 14px;
+    }
+
+    .umbrellaLogo{
+      width: 130px;
+      height: 130px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 16px rgba(193,18,31,.25));
+      animation: slowSpin 12s linear infinite;
+    }
+
+    @keyframes slowSpin{
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Boot console */
+    .console{
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: #060609;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: #e5e7eb;
+      max-height: 180px;
+      overflow: hidden;
+      position: relative;
+    }
+    .console::before{
+      content:"SYSTEM BOOT LOG";
+      position:absolute;
+      top:10px;
+      right:12px;
+      font-size:10px;
+      color: rgba(156,163,175,.55);
+      letter-spacing:.18em;
+    }
+
+    .line{
+      white-space: pre-wrap;
+      margin: 0 0 6px;
+      color: rgba(229,231,235,.92);
+    }
+
+    .ok{ color: rgba(34,197,94,.9); }
+    .warn{ color: rgba(193,18,31,.9); }
+    .dim{ color: rgba(156,163,175,.75); }
+
+    .typeRow{
+      display:flex;
+      gap:8px;
+      align-items:baseline;
+      margin-top: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: rgba(229,231,235,.92);
+    }
+    .prompt{
+      color: rgba(156,163,175,.9);
+      letter-spacing:.08em;
+    }
+    .typed{
+      min-height: 14px;
+    }
+    .caret{
+      width: 8px;
+      height: 14px;
+      background: rgba(229,231,235,.8);
+      display:inline-block;
+      transform: translateY(2px);
+      animation: blink 1s steps(1) infinite;
+      margin-left: 2px;
+    }
+    @keyframes blink{
+      50%{opacity:0;}
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="scanline"></div>
-
-<div class="page">
-
-<div class="topbar bootFlicker">
-  <div class="brand">
-    <h1>UMBRELLA CORPORATION</h1>
-    <div class="sub">Biohazard Containment & Research Division</div>
-  </div>
-  <div class="stamp">CONFIDENTIAL</div>
-</div>
-
-<div class="mainLogoWrap bootFlicker">
-  <img class="mainUmbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Logo">
-</div>
-
-<div class="panel">
-  <h2>Transport Log Access Portal</h2>
-
-  <div class="meta">
-    Document: UC-BCRD-13B-EDN<br>
-    Project: EDEN PROTOCOL<br>
-    Specimen: T-VIRUS VARIANT 13-B<br>
-    Clearance: ALPHA-7 OR HIGHER
-  </div>
-
-  <button class="btn" id="openBtn">View Containment File</button>
-</div>
-
-<footer>
-Umbrella Corporation — Internal Use Only • All access monitored.
-</footer>
-
-</div>
-
-<!-- Loading Screen -->
-<div class="overlay" id="accessOverlay">
-  <div class="modal">
-    <div class="modalHeader">Credential Verification</div>
-    <div class="modalBody">
-      <img src="./umbrella-logo.jpg" class="loaderLogo" alt="Umbrella Logo">
-      <div id="statusMsg">Initializing secure session…</div>
-      <div class="progress">
-        <div class="bar" id="bar"></div>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <h1>UMBRELLA CORPORATION</h1>
+        <div class="sub">Biohazard Containment &amp; Research Division • Global Operations Command</div>
       </div>
-      <div id="percent">0%</div>
+      <div class="stamp">CONFIDENTIAL</div>
+    </div>
+
+    <div class="panel">
+      <h2>Transport Log Access Portal</h2>
+      <p>Classification: <b>LEVEL 4 — RESTRICTED</b> • All access attempts are logged for audit compliance.</p>
+
+      <div class="meta">
+        <div><b>Document:</b> UC-BCRD-13B-EDN</div>
+        <div><b>Project:</b> EDEN PROTOCOL</div>
+        <div><b>Specimen:</b> T-VIRUS VARIANT 13-B</div>
+        <div><b>Transport Status:</b> ACTIVE</div>
+        <div><b>Handling Clearance:</b> ALPHA-7 OR HIGHER</div>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn" id="openBtn">View Containment File</button>
+        <a class="btn secondary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
+      </div>
+    </div>
+
+    <footer>
+      Umbrella Corporation — Internal Use Only • This portal is a simulated access interface for display purposes.
+      <br>
+      © Umbrella Corporation. All activity may be monitored and recorded.
+    </footer>
+  </div>
+
+  <!-- ACCESS OVERLAY (10s load + spinning logo + boot log) -->
+  <div class="overlay" id="accessOverlay" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width: 720px;">
+      <div class="modalHeader">
+        <div>Secure Session Initialization</div>
+        <button class="close" id="accessCloseBtn">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="progressWrap">
+          <div class="logoWrap">
+            <!-- Upload your logo to the repo and name it umbrella-logo.jpg (or change the filename here) -->
+            <img class="umbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Corporation Logo">
+          </div>
+
+          <div class="auditLine">
+            <div>System</div>
+            <div class="flag">ACCESS LOGGED</div>
+          </div>
+
+          <div class="timestamp">Timestamp: <span id="auditTime"></span></div>
+
+          <div class="console" id="console"></div>
+
+          <div class="typeRow">
+            <span class="prompt">UC:\BOOT&gt;</span>
+            <span class="typed" id="typed"></span><span class="caret"></span>
+          </div>
+
+          <div class="progress">
+            <div class="bar" id="auditBar"></div>
+          </div>
+          <div class="pct" id="auditPct">0%</div>
+
+          <div class="tiny">Destination: <b style="color:var(--ink)">Containment File Viewer</b> • UC-BCRD-13B-EDN</div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- PDF Viewer -->
-<div class="overlay" id="pdfOverlay">
-  <div class="modal">
-    <div class="modalHeader">Containment File Viewer</div>
-    <iframe id="pdfFrame"></iframe>
+  <!-- PDF OVERLAY -->
+  <div class="overlay" id="pdfOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <div>Containment File Viewer — UC-BCRD-13B-EDN</div>
+        <button class="close" id="pdfCloseBtn">Close</button>
+      </div>
+      <iframe id="pdfFrame" title="Containment File PDF"></iframe>
+    </div>
   </div>
-</div>
 
-<script>
-const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
-const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
+  <script>
+    // Your Google Drive file
+    const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
 
-const openBtn = document.getElementById("openBtn");
-const accessOverlay = document.getElementById("accessOverlay");
-const pdfOverlay = document.getElementById("pdfOverlay");
-const bar = document.getElementById("bar");
-const percent = document.getElementById("percent");
-const pdfFrame = document.getElementById("pdfFrame");
-const statusMsg = document.getElementById("statusMsg");
+    // Embed preview link (works in iframe)
+    const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
 
-openBtn.addEventListener("click", () => {
+    // Direct download link
+    const DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
 
-  bar.style.width = "0%";
-  percent.textContent = "0%";
-  statusMsg.textContent = "Initializing secure session…";
+    // Loading duration (ms) — requested ~10 seconds
+    const LOADING_DURATION_MS = 10000;
 
-  accessOverlay.style.display = "flex";
+    const openBtn = document.getElementById("openBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
 
-  let start = performance.now();
-  let duration = 10000; // 10 seconds
+    const accessOverlay = document.getElementById("accessOverlay");
+    const accessCloseBtn = document.getElementById("accessCloseBtn");
 
-  function animate(now){
-    let progress = Math.min((now - start) / duration, 1);
-    let pct = Math.floor(progress * 100);
+    const pdfOverlay = document.getElementById("pdfOverlay");
+    const pdfCloseBtn = document.getElementById("pdfCloseBtn");
+    const pdfFrame = document.getElementById("pdfFrame");
 
-    bar.style.width = pct + "%";
-    percent.textContent = pct + "%";
+    const auditTime = document.getElementById("auditTime");
+    const auditBar = document.getElementById("auditBar");
+    const auditPct = document.getElementById("auditPct");
 
-    if(pct === 25) statusMsg.textContent = "Decrypting containment file header…";
-    if(pct === 55) statusMsg.textContent = "Validating chain-of-custody signature…";
-    if(pct === 85) statusMsg.textContent = "Finalizing viewer session…";
+    const consoleEl = document.getElementById("console");
+    const typedEl = document.getElementById("typed");
 
-    if(progress < 1){
-      requestAnimationFrame(animate);
-    } else {
-      statusMsg.textContent = "Access granted.";
-      setTimeout(()=>{
-        accessOverlay.style.display = "none";
-        pdfOverlay.style.display = "flex";
-        pdfFrame.src = PDF_URL;
-      }, 600);
+    downloadBtn.href = DOWNLOAD_URL;
+
+    function pad(n){ return String(n).padStart(2,"0"); }
+
+    function formatTimestamp(d){
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth()+1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mi = pad(d.getMinutes());
+      const ss = pad(d.getSeconds());
+      const off = -d.getTimezoneOffset();
+      const sign = off >= 0 ? "+" : "-";
+      const abs = Math.abs(off);
+      const oh = pad(Math.floor(abs/60));
+      const om = pad(abs%60);
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} UTC${sign}${oh}:${om}`;
     }
-  }
 
-  requestAnimationFrame(animate);
-});
-</script>
+    function show(el){ el.style.display = "flex"; document.body.style.overflow = "hidden"; }
+    function hide(el){ el.style.display = "none"; document.body.style.overflow = ""; }
 
+    // Boot log lines (sterile, Resident Evil-ish)
+    const bootLines = [
+      { text: "[INIT] Umbrella Secure Terminal v3.7.12", cls: "dim" },
+      { text: "[CHK ] Hardware integrity scan ............ ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[CHK ] Memory map verification ............ ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[NET ] Establishing secure channel ........ ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[AUTH] Validating transport authorization . ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[KEY ] Decrypting containment header ...... ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[AUD ] Writing audit event to ledger ...... ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[SAFE] Biohazard compliance check ......... ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
+      { text: "[INFO] Clearance required: ALPHA-7", cls: "dim" },
+      { text: "[INFO] Destination: UC-BCRD-13B-EDN Viewer", cls: "dim" },
+    ];
+
+    function addConsoleLine(lineObj){
+      const p = document.createElement("div");
+      p.className = "line " + (lineObj.cls || "");
+      p.textContent = lineObj.text;
+
+      if (lineObj.suffix){
+        const s = document.createElement("span");
+        s.className = " " + (lineObj.suffix.cls || "");
+        s.textContent = lineObj.suffix.text;
+        p.appendChild(s);
+      }
+
+      consoleEl.appendChild(p);
+
+      // keep it scrolly but contained
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function resetBootUI(){
+      consoleEl.innerHTML = "";
+      typedEl.textContent = "";
+      auditBar.style.width = "0%";
+      auditPct.textContent = "0%";
+    }
+
+    // Typing effect for boot command line
+    function typeText(text, totalMs){
+      typedEl.textContent = "";
+      const chars = text.split("");
+      const step = Math.max(18, Math.floor(totalMs / chars.length));
+      let i = 0;
+
+      return new Promise((resolve) => {
+        const timer = setInterval(() => {
+          typedEl.textContent += chars[i] ?? "";
+          i++;
+          if (i >= chars.length){
+            clearInterval(timer);
+            resolve();
+          }
+        }, step);
+      });
+    }
+
+    async function runBootSequence(){
+      resetBootUI();
+
+      // show initial boot command typing
+      await typeText("INIT_SECURE_SESSION --TARGET UC-BCRD-13B-EDN", 2200);
+
+      // then start log lines staggered
+      let idx = 0;
+      const start = performance.now();
+
+      function progressTick(now){
+        const t = Math.min(1, (now - start) / LOADING_DURATION_MS);
+        const pct = Math.round(t * 100);
+
+        auditBar.style.width = pct + "%";
+        auditPct.textContent = pct + "%";
+
+        // Print boot lines gradually across the 10 seconds
+        const expectedLines = Math.floor((pct / 100) * bootLines.length);
+        while (idx < expectedLines){
+          addConsoleLine(bootLines[idx]);
+          idx++;
+        }
+
+        // Add a few timed “system-ish” moments
+        if (pct === 25) addConsoleLine({ text: "[WARN] Do not interrupt transport chain-of-custody.", cls: "warn" });
+        if (pct === 55) addConsoleLine({ text: "[INFO] Specimen container temperature lock: ENABLED", cls: "dim" });
+        if (pct === 80) addConsoleLine({ text: "[INFO] Viewer handshake: NEGOTIATING", cls: "dim" });
+        if (pct === 95) addConsoleLine({ text: "[INFO] Viewer handshake: COMPLETE", cls: "dim", suffix: { text: "OK", cls: "ok" } });
+
+        if (t < 1){
+          requestAnimationFrame(progressTick);
+        }
+      }
+
+      requestAnimationFrame(progressTick);
+
+      // Wait full duration, then open PDF
+      await new Promise(res => setTimeout(res, LOADING_DURATION_MS));
+
+      addConsoleLine({ text: "[DONE] Verification complete. Opening containment file…", cls: "ok" });
+    }
+
+    async function openAccessThenPdf(){
+      auditTime.textContent = formatTimestamp(new Date());
+      show(accessOverlay);
+
+      await runBootSequence();
+
+      setTimeout(() => {
+        hide(accessOverlay);
+        pdfFrame.src = PDF_URL;
+        show(pdfOverlay);
+      }, 650);
+    }
+
+    function closePdf(){
+      hide(pdfOverlay);
+      pdfFrame.src = "";
+    }
+
+    openBtn.addEventListener("click", openAccessThenPdf);
+    accessCloseBtn.addEventListener("click", () => hide(accessOverlay));
+    pdfCloseBtn.addEventListener("click", closePdf);
+
+    // Click backdrop to close
+    accessOverlay.addEventListener("click", (e) => { if (e.target === accessOverlay) hide(accessOverlay); });
+    pdfOverlay.addEventListener("click", (e) => { if (e.target === pdfOverlay) closePdf(); });
+
+    // ESC closes
+    window.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (pdfOverlay.style.display === "flex") closePdf();
+      else if (accessOverlay.style.display === "flex") hide(accessOverlay);
+    });
+  </script>
 </body>
 </html>
-
-
