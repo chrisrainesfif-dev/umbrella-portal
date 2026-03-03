@@ -1,366 +1,500 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Umbrella Corporation — Transport Log Access</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Umbrella Corporation — Transport Log Access</title>
 
-<style>
-:root{
-  --bg:#0b0b0d;
-  --panel:#141418;
-  --ink:#f5f5f5;
-  --muted:#9ca3af;
-  --line:#2a2a32;
-  --danger:#c1121f;
-}
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-}
-
-.page{
-  max-width:900px;
-  margin:60px auto;
-  padding:0 24px 80px;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  border-bottom:1px solid var(--line);
-  padding-bottom:20px;
-}
-
-.brand h1{
-  margin:0;
-  font-size:20px;
-  letter-spacing:.15em;
-  font-weight:700;
-}
-
-.brand .sub{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-  letter-spacing:.05em;
-}
-
-.stamp{
-  border:2px solid var(--danger);
-  color:var(--danger);
-  padding:10px 14px;
-  transform:rotate(-10deg);
-  font-weight:700;
-  opacity:.2;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-}
-
-.panel{
-  border:1px solid var(--line);
-  background:var(--panel);
-  padding:24px;
-  border-radius:6px;
-  margin-top:40px;
-  box-shadow:0 0 30px rgba(0,0,0,.6);
-}
-
-.panel h3{
-  margin-top:0;
-  letter-spacing:.12em;
-  font-size:14px;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-
-.panel p{
-  font-size:14px;
-}
-
-.btn{
-  background:transparent;
-  border:1px solid var(--ink);
-  color:var(--ink);
-  padding:12px 18px;
-  border-radius:4px;
-  cursor:pointer;
-  font-weight:bold;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  margin-top:10px;
-  transition:all .2s ease;
-}
-
-.btn:hover{
-  background:var(--ink);
-  color:#000;
-}
-
-footer{
-  margin-top:60px;
-  font-size:11px;
-  color:var(--muted);
-  border-top:1px solid var(--line);
-  padding-top:16px;
-}
-
-/* MODALS */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal{
-  background:var(--panel);
-  width:90%;
-  max-width:800px;
-  border:1px solid var(--line);
-  border-radius:6px;
-  overflow:hidden;
-  box-shadow:0 0 40px rgba(0,0,0,.9);
-}
-
-.modal-header{
-  padding:14px 18px;
-  border-bottom:1px solid var(--line);
-  font-weight:bold;
-  letter-spacing:.1em;
-  font-size:12px;
-  text-transform:uppercase;
-  background:#101014;
-}
-
-.modal-body{
-  padding:20px;
-}
-
-iframe{
-  width:100%;
-  height:70vh;
-  border:none;
-  background:#000;
-}
-
-.progress{
-  height:8px;
-  background:#1f1f24;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:20px;
-}
-
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:var(--danger);
-  box-shadow:0 0 8px var(--danger);
-}
-</style>  
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-}
-.page{
-  max-width:900px;
-  margin:40px auto;
-  padding:0 20px 60px;
-}
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid var(--line);
-  padding-bottom:18px;
-}
-.brand h1{
-  margin:0;
-  font-size:18px;
-  letter-spacing:.08em;
-}
-.brand .sub{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-}
-.stamp{
-  border:2px solid var(--danger);
-  color:var(--danger);
-  padding:8px 12px;
-  transform:rotate(-10deg);
-  font-weight:700;
-  opacity:.25;
-  letter-spacing:.1em;
-}
-.panel{
-  border:1px solid var(--line);
-  background:var(--panel);
-  padding:16px;
-  border-radius:10px;
-  margin-top:20px;
-}
-.btn{
-  background:var(--ink);
-  color:#fff;
-  padding:10px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.btn:hover{
-  opacity:.85;
-}
-footer{
-  margin-top:30px;
-  font-size:11px;
-  color:var(--muted);
-  border-top:1px solid var(--line);
-  padding-top:12px;
-}
-
-/* MODALS */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-.modal{
-  background:#fff;
-  width:90%;
-  max-width:800px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  overflow:hidden;
-}
-.modal-header{
-  padding:12px;
-  border-bottom:1px solid var(--line);
-  font-weight:bold;
-}
-.modal-body{
-  padding:16px;
-}
-iframe{
-  width:100%;
-  height:70vh;
-  border:none;
-}
-.progress{
-  height:10px;
-  background:#eee;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:15px;
-}
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:#111;
-}
-</style>
-</head>
-<body>
-
-<div class="page">
-
-<div class="topbar">
-<div class="brand">
-<h1>UMBRELLA CORPORATION</h1>
-<div class="sub">Biohazard Containment & Research Division</div>
-</div>
-<div class="stamp">CONFIDENTIAL</div>
-</div>
-
-<div class="panel">
-<h3>TRANSPORT LOG ACCESS PORTAL</h3>
-<p>Classification: <strong>LEVEL 4 – RESTRICTED</strong></p>
-
-<button class="btn" id="openBtn">VIEW CONTAINMENT FILE</button>
-</div>
-
-<footer>
-Umbrella Corporation — Internal Use Only • All activity monitored and recorded.
-</footer>
-
-</div>
-
-<!-- ACCESS ANIMATION -->
-<div class="overlay" id="accessOverlay">
-<div class="modal">
-<div class="modal-header">Credential Verification</div>
-<div class="modal-body">
-<div id="timestamp"></div>
-<div class="progress">
-<div class="progress-bar" id="bar"></div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- PDF VIEWER -->
-<div class="overlay" id="pdfOverlay">
-<div class="modal">
-<div class="modal-header">Containment File Viewer</div>
-<div class="modal-body">
-<iframe id="pdfFrame"></iframe>
-</div>
-</div>
-</div>
-
-<script>
-const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
-const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
-
-const openBtn = document.getElementById("openBtn");
-const accessOverlay = document.getElementById("accessOverlay");
-const pdfOverlay = document.getElementById("pdfOverlay");
-const bar = document.getElementById("bar");
-const pdfFrame = document.getElementById("pdfFrame");
-const timestamp = document.getElementById("timestamp");
-
-function formatTime(){
-  const d = new Date();
-  return d.toISOString().replace("T"," ").split(".")[0] + " UTC";
-}
-
-openBtn.addEventListener("click", () => {
-
-  timestamp.textContent = "Access Logged: " + formatTime();
-  bar.style.width = "0%";
-  accessOverlay.style.display = "flex";
-
-  let width = 0;
-  const interval = setInterval(() => {
-    width += 5;
-    bar.style.width = width + "%";
-
-    if(width >= 100){
-      clearInterval(interval);
-      setTimeout(()=>{
-        accessOverlay.style.display = "none";
-        pdfOverlay.style.display = "flex";
-        pdfFrame.src = PDF_URL;
-      },300);
+  <style>
+    :root{
+      --bg:#0b0b0d;
+      --panel:#141418;
+      --ink:#f5f5f5;
+      --muted:#9ca3af;
+      --line:#2a2a32;
+      --danger:#c1121f;
     }
-  },60);
-});
 
-</script>
+    *{box-sizing:border-box}
 
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    .page{
+      max-width: 920px;
+      margin: 60px auto;
+      padding: 0 24px 80px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .15em;
+      font-weight: 700;
+    }
+
+    .brand .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+
+    .stamp{
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      padding: 10px 14px;
+      transform: rotate(-10deg);
+      font-weight: 700;
+      opacity: .22;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    @media (max-width: 720px){
+      .stamp{display:none;}
+      .page{margin: 30px auto;}
+      .brand h1{font-size: 18px;}
+    }
+
+    .panel{
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 24px;
+      border-radius: 6px;
+      margin-top: 40px;
+      box-shadow: 0 0 30px rgba(0,0,0,.65);
+    }
+
+    .panel h2{
+      margin: 0 0 10px;
+      letter-spacing: .12em;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel p{
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .meta{
+      border: 1px solid var(--line);
+      background: #101014;
+      border-radius: 6px;
+      padding: 14px;
+      margin: 14px 0 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meta b{color: var(--ink); font-weight: 700;}
+
+    .btnRow{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn{
+      background: transparent;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      padding: 12px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: all .18s ease;
+      text-decoration: none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .btn:hover{
+      background: var(--ink);
+      color: #000;
+    }
+
+    .btn.secondary{
+      border-color: var(--line);
+      color: var(--muted);
+    }
+    .btn.secondary:hover{
+      background: transparent;
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    footer{
+      margin-top: 60px;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+      letter-spacing: .04em;
+    }
+
+    /* Overlays / Modals */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.90);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .modal{
+      width: min(900px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,.9);
+    }
+
+    .modalHeader{
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      letter-spacing: .12em;
+      font-size: 12px;
+      text-transform: uppercase;
+      background: #101014;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .close{
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 4px;
+      cursor:pointer;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .close:hover{
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .modalBody{
+      padding: 20px;
+    }
+
+    iframe{
+      width: 100%;
+      height: 72vh;
+      border: none;
+      background: #000;
+    }
+
+    .progressWrap{
+      border: 1px solid var(--line);
+      background: #101014;
+      border-radius: 6px;
+      padding: 18px;
+    }
+
+    .auditLine{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .auditLine .flag{
+      color: var(--danger);
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+
+    .auditMsg{
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .timestamp{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .progress{
+      height: 8px;
+      background: #1f1f24;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+    }
+
+    .bar{
+      height: 100%;
+      width: 0%;
+      background: var(--danger);
+      box-shadow: 0 0 10px var(--danger);
+    }
+
+    .pct{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tiny{
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Umbrella logo loader */
+    .logoWrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin: 8px 0 14px;
+    }
+
+    .umbrellaLogo{
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 14px rgba(193,18,31,.25));
+      animation: slowSpin 10s linear infinite; /* slow spin */
+    }
+
+    @keyframes slowSpin{
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <h1>UMBRELLA CORPORATION</h1>
+        <div class="sub">Biohazard Containment &amp; Research Division • Global Operations Command</div>
+      </div>
+      <div class="stamp">CONFIDENTIAL</div>
+    </div>
+
+    <div class="panel">
+      <h2>Transport Log Access Portal</h2>
+      <p>Classification: <b>LEVEL 4 — RESTRICTED</b> • All access attempts are logged for audit compliance.</p>
+
+      <div class="meta">
+        <div><b>Document:</b> UC-BCRD-13B-EDN</div>
+        <div><b>Project:</b> EDEN PROTOCOL</div>
+        <div><b>Specimen:</b> T-VIRUS VARIANT 13-B</div>
+        <div><b>Transport Status:</b> ACTIVE</div>
+        <div><b>Handling Clearance:</b> ALPHA-7 OR HIGHER</div>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn" id="openBtn">View Containment File</button>
+        <a class="btn secondary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
+      </div>
+    </div>
+
+    <footer>
+      Umbrella Corporation — Internal Use Only • This portal is a simulated access interface for display purposes.
+      <br>
+      © Umbrella Corporation. All activity may be monitored and recorded.
+    </footer>
+  </div>
+
+  <!-- ACCESS OVERLAY (10s load + spinning logo) -->
+  <div class="overlay" id="accessOverlay" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width: 680px;">
+      <div class="modalHeader">
+        <div>Credential Verification</div>
+        <button class="close" id="accessCloseBtn">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="progressWrap">
+          <div class="logoWrap">
+            <!-- IMPORTANT: upload your logo to the repo and name it umbrella-logo.jpg -->
+            <img class="umbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Corporation Logo">
+          </div>
+
+          <div class="auditLine">
+            <div>Audit Event</div>
+            <div class="flag">ACCESS LOGGED</div>
+          </div>
+
+          <div class="auditMsg" id="auditMsg">Initializing secure session… <span style="color:var(--muted)">(Accord 17-C)</span></div>
+          <div class="timestamp">Timestamp: <span id="auditTime"></span></div>
+
+          <div class="progress">
+            <div class="bar" id="auditBar"></div>
+          </div>
+          <div class="pct" id="auditPct">0%</div>
+
+          <div class="tiny">Destination: <b style="color:var(--ink)">Containment File Viewer</b> • UC-BCRD-13B-EDN</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF OVERLAY -->
+  <div class="overlay" id="pdfOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <div>Containment File Viewer — UC-BCRD-13B-EDN</div>
+        <button class="close" id="pdfCloseBtn">Close</button>
+      </div>
+      <iframe id="pdfFrame" title="Containment File PDF"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // Your Google Drive file
+    const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
+
+    // Embed preview link (works in iframe)
+    const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
+
+    // Direct download link
+    const DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
+
+    // Loading screen duration (ms) — requested ~10 seconds
+    const LOADING_DURATION_MS = 10000;
+
+    const openBtn = document.getElementById("openBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    const accessOverlay = document.getElementById("accessOverlay");
+    const accessCloseBtn = document.getElementById("accessCloseBtn");
+
+    const pdfOverlay = document.getElementById("pdfOverlay");
+    const pdfCloseBtn = document.getElementById("pdfCloseBtn");
+    const pdfFrame = document.getElementById("pdfFrame");
+
+    const auditTime = document.getElementById("auditTime");
+    const auditBar = document.getElementById("auditBar");
+    const auditPct = document.getElementById("auditPct");
+    const auditMsg = document.getElementById("auditMsg");
+
+    downloadBtn.href = DOWNLOAD_URL;
+
+    function pad(n){ return String(n).padStart(2,"0"); }
+
+    function formatTimestamp(d){
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth()+1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mi = pad(d.getMinutes());
+      const ss = pad(d.getSeconds());
+      const off = -d.getTimezoneOffset();
+      const sign = off >= 0 ? "+" : "-";
+      const abs = Math.abs(off);
+      const oh = pad(Math.floor(abs/60));
+      const om = pad(abs%60);
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} UTC${sign}${oh}:${om}`;
+    }
+
+    function show(el){ el.style.display = "flex"; document.body.style.overflow = "hidden"; }
+    function hide(el){ el.style.display = "none"; document.body.style.overflow = ""; }
+
+    function openAccessThenPdf(){
+      // reset UI
+      auditTime.textContent = formatTimestamp(new Date());
+      auditBar.style.width = "0%";
+      auditPct.textContent = "0%";
+      auditMsg.innerHTML = 'Initializing secure session… <span style="color:var(--muted)">(Accord 17-C)</span>';
+
+      show(accessOverlay);
+
+      const start = performance.now();
+
+      function tick(now){
+        const t = Math.min(1, (now - start) / LOADING_DURATION_MS);
+        const pct = Math.round(t * 100);
+
+        auditBar.style.width = pct + "%";
+        auditPct.textContent = pct + "%";
+
+        // Optional staged messaging to feel like a system boot
+        if (pct === 10) auditMsg.textContent = "Validating transport authorization…";
+        if (pct === 35) auditMsg.textContent = "Decrypting containment file header…";
+        if (pct === 65) auditMsg.textContent = "Verifying chain-of-custody signature…";
+        if (pct === 90) auditMsg.textContent = "Finalizing viewer session…";
+
+        if (t < 1){
+          requestAnimationFrame(tick);
+        } else {
+          auditMsg.textContent = "Verification complete. Opening containment file…";
+          setTimeout(() => {
+            hide(accessOverlay);
+            pdfFrame.src = PDF_URL;
+            show(pdfOverlay);
+          }, 500);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function closePdf(){
+      hide(pdfOverlay);
+      pdfFrame.src = "";
+    }
+
+    openBtn.addEventListener("click", openAccessThenPdf);
+    accessCloseBtn.addEventListener("click", () => hide(accessOverlay));
+    pdfCloseBtn.addEventListener("click", closePdf);
+
+    // Click backdrop to close
+    accessOverlay.addEventListener("click", (e) => { if (e.target === accessOverlay) hide(accessOverlay); });
+    pdfOverlay.addEventListener("click", (e) => { if (e.target === pdfOverlay) closePdf(); });
+
+    // ESC closes
+    window.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (pdfOverlay.style.display === "flex") closePdf();
+      else if (accessOverlay.style.display === "flex") hide(accessOverlay);
+    });
+  </script>
 </body>
-
 </html>
+
 
