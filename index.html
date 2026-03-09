@@ -142,10 +142,23 @@
       border-color: var(--line);
       color: var(--muted);
     }
+
     .btn.secondary:hover{
       background: transparent;
       border-color: var(--ink);
       color: var(--ink);
+    }
+
+    .btn.join{
+      background: var(--danger);
+      color: #fff;
+      border-color: var(--danger);
+    }
+
+    .btn.join:hover{
+      background: #a50f1a;
+      border-color: #a50f1a;
+      color:#fff;
     }
 
     footer{
@@ -157,7 +170,6 @@
       letter-spacing: .04em;
     }
 
-    /* Overlays / Modals */
     .overlay{
       position: fixed;
       inset: 0;
@@ -179,7 +191,6 @@
       position: relative;
     }
 
-    /* subtle scanline */
     .modal::after{
       content:"";
       pointer-events:none;
@@ -305,7 +316,6 @@
       color: var(--muted);
     }
 
-    /* Umbrella logo loader */
     .logoWrap{
       display:flex;
       align-items:center;
@@ -326,7 +336,6 @@
       to   { transform: rotate(360deg); }
     }
 
-    /* Boot console */
     .console{
       margin-top: 14px;
       border: 1px solid var(--line);
@@ -340,6 +349,7 @@
       overflow: hidden;
       position: relative;
     }
+
     .console::before{
       content:"SYSTEM BOOT LOG";
       position:absolute;
@@ -369,13 +379,16 @@
       font-size: 12px;
       color: rgba(229,231,235,.92);
     }
+
     .prompt{
       color: rgba(156,163,175,.9);
       letter-spacing:.08em;
     }
+
     .typed{
       min-height: 14px;
     }
+
     .caret{
       width: 8px;
       height: 14px;
@@ -385,8 +398,25 @@
       animation: blink 1s steps(1) infinite;
       margin-left: 2px;
     }
+
     @keyframes blink{
       50%{opacity:0;}
+    }
+
+    .imageModalBody{
+      padding: 0;
+      background:#000;
+      position: relative;
+      z-index:1;
+    }
+
+    .joinImage{
+      display:block;
+      width:100%;
+      height:auto;
+      max-height:85vh;
+      object-fit:contain;
+      background:#000;
     }
   </style>
 </head>
@@ -416,6 +446,7 @@
       <div class="btnRow">
         <button class="btn" id="openBtn">View Containment File</button>
         <a class="btn secondary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn join" id="joinBtn">Join Umbrella</button>
       </div>
     </div>
 
@@ -426,7 +457,7 @@
     </footer>
   </div>
 
-  <!-- ACCESS OVERLAY (10s load + spinning logo + boot log) -->
+  <!-- ACCESS OVERLAY -->
   <div class="overlay" id="accessOverlay" role="dialog" aria-modal="true">
     <div class="modal" style="max-width: 720px;">
       <div class="modalHeader">
@@ -436,7 +467,6 @@
       <div class="modalBody">
         <div class="progressWrap">
           <div class="logoWrap">
-            <!-- Upload your logo to the repo and name it umbrella-logo.jpg (or change the filename here) -->
             <img class="umbrellaLogo" src="./umbrella-logo.jpg" alt="Umbrella Corporation Logo">
           </div>
 
@@ -476,20 +506,27 @@
     </div>
   </div>
 
+  <!-- JOIN IMAGE OVERLAY -->
+  <div class="overlay" id="joinOverlay" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width: 1000px;">
+      <div class="modalHeader">
+        <div>Umbrella Recruitment Initiative</div>
+        <button class="close" id="joinCloseBtn">Close</button>
+      </div>
+      <div class="imageModalBody">
+        <img class="joinImage" src="./join-umbrella.jpg" alt="Join Umbrella recruitment image">
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Your Google Drive file
     const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
-
-    // Embed preview link (works in iframe)
     const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
-
-    // Direct download link
     const DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
-
-    // Loading duration (ms) — requested ~10 seconds
     const LOADING_DURATION_MS = 10000;
 
     const openBtn = document.getElementById("openBtn");
+    const joinBtn = document.getElementById("joinBtn");
     const downloadBtn = document.getElementById("downloadBtn");
 
     const accessOverlay = document.getElementById("accessOverlay");
@@ -498,6 +535,9 @@
     const pdfOverlay = document.getElementById("pdfOverlay");
     const pdfCloseBtn = document.getElementById("pdfCloseBtn");
     const pdfFrame = document.getElementById("pdfFrame");
+
+    const joinOverlay = document.getElementById("joinOverlay");
+    const joinCloseBtn = document.getElementById("joinCloseBtn");
 
     const auditTime = document.getElementById("auditTime");
     const auditBar = document.getElementById("auditBar");
@@ -525,10 +565,16 @@
       return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} UTC${sign}${oh}:${om}`;
     }
 
-    function show(el){ el.style.display = "flex"; document.body.style.overflow = "hidden"; }
-    function hide(el){ el.style.display = "none"; document.body.style.overflow = ""; }
+    function show(el){
+      el.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
 
-    // Boot log lines (sterile, Resident Evil-ish)
+    function hide(el){
+      el.style.display = "none";
+      document.body.style.overflow = "";
+    }
+
     const bootLines = [
       { text: "[INIT] Umbrella Secure Terminal v3.7.12", cls: "dim" },
       { text: "[CHK ] Hardware integrity scan ............ ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
@@ -539,7 +585,7 @@
       { text: "[AUD ] Writing audit event to ledger ...... ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
       { text: "[SAFE] Biohazard compliance check ......... ", cls: "dim", suffix: { text: "OK", cls: "ok" } },
       { text: "[INFO] Clearance required: ALPHA-7", cls: "dim" },
-      { text: "[INFO] Destination: UC-BCRD-13B-EDN Viewer", cls: "dim" },
+      { text: "[INFO] Destination: UC-BCRD-13B-EDN Viewer", cls: "dim" }
     ];
 
     function addConsoleLine(lineObj){
@@ -555,8 +601,6 @@
       }
 
       consoleEl.appendChild(p);
-
-      // keep it scrolly but contained
       consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 
@@ -567,7 +611,6 @@
       auditPct.textContent = "0%";
     }
 
-    // Typing effect for boot command line
     function typeText(text, totalMs){
       typedEl.textContent = "";
       const chars = text.split("");
@@ -588,11 +631,8 @@
 
     async function runBootSequence(){
       resetBootUI();
-
-      // show initial boot command typing
       await typeText("INIT_SECURE_SESSION --TARGET UC-BCRD-13B-EDN", 2200);
 
-      // then start log lines staggered
       let idx = 0;
       const start = performance.now();
 
@@ -603,14 +643,12 @@
         auditBar.style.width = pct + "%";
         auditPct.textContent = pct + "%";
 
-        // Print boot lines gradually across the 10 seconds
         const expectedLines = Math.floor((pct / 100) * bootLines.length);
         while (idx < expectedLines){
           addConsoleLine(bootLines[idx]);
           idx++;
         }
 
-        // Add a few timed “system-ish” moments
         if (pct === 25) addConsoleLine({ text: "[WARN] Do not interrupt transport chain-of-custody.", cls: "warn" });
         if (pct === 55) addConsoleLine({ text: "[INFO] Specimen container temperature lock: ENABLED", cls: "dim" });
         if (pct === 80) addConsoleLine({ text: "[INFO] Viewer handshake: NEGOTIATING", cls: "dim" });
@@ -622,10 +660,7 @@
       }
 
       requestAnimationFrame(progressTick);
-
-      // Wait full duration, then open PDF
       await new Promise(res => setTimeout(res, LOADING_DURATION_MS));
-
       addConsoleLine({ text: "[DONE] Verification complete. Opening containment file…", cls: "ok" });
     }
 
@@ -647,19 +682,43 @@
       pdfFrame.src = "";
     }
 
+    function openJoinImage(){
+      show(joinOverlay);
+    }
+
+    function closeJoinImage(){
+      hide(joinOverlay);
+    }
+
     openBtn.addEventListener("click", openAccessThenPdf);
+    joinBtn.addEventListener("click", openJoinImage);
+
     accessCloseBtn.addEventListener("click", () => hide(accessOverlay));
     pdfCloseBtn.addEventListener("click", closePdf);
+    joinCloseBtn.addEventListener("click", closeJoinImage);
 
-    // Click backdrop to close
-    accessOverlay.addEventListener("click", (e) => { if (e.target === accessOverlay) hide(accessOverlay); });
-    pdfOverlay.addEventListener("click", (e) => { if (e.target === pdfOverlay) closePdf(); });
+    accessOverlay.addEventListener("click", (e) => {
+      if (e.target === accessOverlay) hide(accessOverlay);
+    });
 
-    // ESC closes
+    pdfOverlay.addEventListener("click", (e) => {
+      if (e.target === pdfOverlay) closePdf();
+    });
+
+    joinOverlay.addEventListener("click", (e) => {
+      if (e.target === joinOverlay) closeJoinImage();
+    });
+
     window.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      if (pdfOverlay.style.display === "flex") closePdf();
-      else if (accessOverlay.style.display === "flex") hide(accessOverlay);
+
+      if (pdfOverlay.style.display === "flex") {
+        closePdf();
+      } else if (joinOverlay.style.display === "flex") {
+        closeJoinImage();
+      } else if (accessOverlay.style.display === "flex") {
+        hide(accessOverlay);
+      }
     });
   </script>
 </body>
