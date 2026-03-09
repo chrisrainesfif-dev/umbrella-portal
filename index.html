@@ -107,6 +107,7 @@
       font-size: 13px;
       color: var(--muted);
     }
+
     .meta b{color: var(--ink); font-weight: 700;}
 
     .btnRow{
@@ -447,6 +448,7 @@
         <button class="btn" id="openBtn">View Containment File</button>
         <a class="btn secondary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
         <button class="btn join" id="joinBtn">Join Umbrella</button>
+        <button class="btn secondary" id="dossierBtn">Eden Protocol Dossier</button>
       </div>
     </div>
 
@@ -499,7 +501,7 @@
   <div class="overlay" id="pdfOverlay" role="dialog" aria-modal="true">
     <div class="modal">
       <div class="modalHeader">
-        <div>Containment File Viewer — UC-BCRD-13B-EDN</div>
+        <div>Containment File Viewer</div>
         <button class="close" id="pdfCloseBtn">Close</button>
       </div>
       <iframe id="pdfFrame" title="Containment File PDF"></iframe>
@@ -523,10 +525,15 @@
     const FILE_ID = "1Yusz2TFim3OlvVzswOe_6-cDYur2VX-u";
     const PDF_URL = `https://drive.google.com/file/d/${FILE_ID}/preview`;
     const DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
+
+    const DOSSIER_FILE_ID = "15ULiSkxHHknJi5mBCPdz93npLcuMZrI8";
+    const DOSSIER_URL = `https://drive.google.com/file/d/${DOSSIER_FILE_ID}/preview`;
+
     const LOADING_DURATION_MS = 10000;
 
     const openBtn = document.getElementById("openBtn");
     const joinBtn = document.getElementById("joinBtn");
+    const dossierBtn = document.getElementById("dossierBtn");
     const downloadBtn = document.getElementById("downloadBtn");
 
     const accessOverlay = document.getElementById("accessOverlay");
@@ -535,6 +542,7 @@
     const pdfOverlay = document.getElementById("pdfOverlay");
     const pdfCloseBtn = document.getElementById("pdfCloseBtn");
     const pdfFrame = document.getElementById("pdfFrame");
+    const pdfModalTitle = pdfOverlay.querySelector(".modalHeader div");
 
     const joinOverlay = document.getElementById("joinOverlay");
     const joinCloseBtn = document.getElementById("joinCloseBtn");
@@ -672,9 +680,16 @@
 
       setTimeout(() => {
         hide(accessOverlay);
+        pdfModalTitle.textContent = "Containment File Viewer — UC-BCRD-13B-EDN";
         pdfFrame.src = PDF_URL;
         show(pdfOverlay);
       }, 650);
+    }
+
+    function openDossier(){
+      pdfModalTitle.textContent = "Containment File Viewer — Eden Protocol Dossier";
+      pdfFrame.src = DOSSIER_URL;
+      show(pdfOverlay);
     }
 
     function closePdf(){
@@ -692,6 +707,7 @@
 
     openBtn.addEventListener("click", openAccessThenPdf);
     joinBtn.addEventListener("click", openJoinImage);
+    dossierBtn.addEventListener("click", openDossier);
 
     accessCloseBtn.addEventListener("click", () => hide(accessOverlay));
     pdfCloseBtn.addEventListener("click", closePdf);
